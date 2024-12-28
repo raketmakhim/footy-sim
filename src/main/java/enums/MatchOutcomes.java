@@ -1,4 +1,4 @@
-package objects;
+package enums;
 
 public enum MatchOutcomes {
     DRAW,
