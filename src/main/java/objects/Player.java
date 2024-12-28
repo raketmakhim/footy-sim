@@ -1,9 +1,7 @@
 package objects;
 
 import constants.PowerConstants;
-
-import java.util.Arrays;
-import java.util.List;
+import enums.Position;
 
 public class Player {
     public String name;

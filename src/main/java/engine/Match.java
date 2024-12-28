@@ -1,11 +1,8 @@
 package engine;
 
 import constants.MatchConstants;
-import objects.MatchOutcomes;
-import objects.Player;
+import enums.MatchOutcomes;
 import objects.Team;
-
-import java.util.stream.Collectors;
 
 public class Match {
     public Team homeTeam;
@@ -37,26 +34,25 @@ public class Match {
 
         byte drawThreshold = getDrawThreshold();
         byte winOrLoseThreshold = getWinOrLoseThreshold();
-        int winThreshold = MatchConstants.calculateWinThreshold(drawThreshold, winOrLoseThreshold);
+        int highPowerThreshold = MatchConstants.calculateWinThreshold(drawThreshold, winOrLoseThreshold);
 
         System.out.println("Draw threshold:" + drawThreshold);
         System.out.println("Win/Lose threshold:" + winOrLoseThreshold);
-        System.out.println("Win threshold:" + winThreshold);
+        System.out.println("Win threshold:" + highPowerThreshold);
 
         if (randomNumber < drawThreshold) {
             return MatchOutcomes.DRAW;
         }
 
-        if (randomNumber < winThreshold){
-            if (homeTeam.power >= awayTeam.power){
-                return MatchOutcomes.HOME_WIN;
-            }
-        } else {
-            if (homeTeam.power < awayTeam.power){
-                return MatchOutcomes.HOME_WIN;
-            }
+        boolean isHigherPowerWinsAndHomeTeamHasHigherPower = randomNumber < highPowerThreshold && homeTeam.power >= awayTeam.power;
+        boolean isHigherPowerLosesAndHomeTeamHasLowerPower = randomNumber > highPowerThreshold && homeTeam.power < awayTeam.power;
+
+        if (isHigherPowerWinsAndHomeTeamHasHigherPower || isHigherPowerLosesAndHomeTeamHasLowerPower) {
+            return MatchOutcomes.HOME_WIN;
         }
 
         return MatchOutcomes.AWAY_WIN;
     }
+
+
 }
