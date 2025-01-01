@@ -1,6 +1,13 @@
 package constants;
 
+import enums.Position;
+import objects.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class PowerConstants {
+
     public static byte CB_TOP_STATS = 5, CB_MID_STATS = 2, CB_BOTTOM_STATS = 4;
     public static byte FB_TOP_STATS = 4, FB_MID_STATS = 4, FB_BOTTOM_STATS = 3;
     public static byte CM_TOP_STATS = 4, CM_MID_STATS = 7, CM_BOTTOM_STATS = 0;
@@ -20,4 +27,29 @@ public class PowerConstants {
     private static byte calculateWeight(byte topStats, byte midStats, byte bottomStats){
         return (byte) (topStats*TOP_STAT_MULTIPLIER + midStats*MID_STAT_MULTIPLIER + bottomStats*BOTTOM_STAT_MULTIPLIER);
     }
+
+    public static int calculateDefensivePower(List<Player> startingEleven){
+        return (int) startingEleven.stream()
+                .filter(players -> players.position.isDefensive())
+                .mapToInt(Player::getPower)
+                .average()
+                .orElse(0);
+    }
+
+    public static int calculateOffensivePower(List<Player> startingEleven){
+        return (int) startingEleven.stream()
+                .filter(players -> players.position.isOffensive())
+                .mapToInt(Player::getPower)
+                .average()
+                .orElse(0);
+    }
+
+    public static int calculateMidfieldPower(List<Player> startingEleven){
+        return (int) startingEleven.stream()
+                .filter(players -> players.position.isOffensive())
+                .mapToInt(Player::getPower)
+                .average()
+                .orElse(0);
+    }
+
 }

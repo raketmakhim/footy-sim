@@ -16,9 +16,11 @@ public class League {
         teams = new ArrayList<>();
     }
 
-    public void addTeam(Team team, String name, byte power) {
+    public void addTeam(Team team, String name, byte power, byte offensivePower, byte defensivePower) {
         team.teamName = name;
         team.power = power;
+        team.offensivePower = offensivePower;
+        team.defensivePower = defensivePower;
         teams.add(team);
     }
 
@@ -35,7 +37,7 @@ public class League {
     public void playLeagueMatch(Team homeTeam, Team awayTeam){
         leagueMatch.homeTeam = homeTeam;
         leagueMatch.awayTeam = awayTeam;
-        MatchOutcomes result = leagueMatch.getMatchOutcome((byte) (Math.random()*100));
+        MatchOutcomes result = leagueMatch.getMatchOutcome();
 
         switch (result) {
             case DRAW -> {
@@ -59,25 +61,16 @@ public class League {
         );
     }
 
-//    public void displayTable() {
-//        sortTeams();
-//        System.out.println("Position | Loss | Points | Win | Draw | Team ");
-//        for (int i = 0; i < teams.size(); i++) {
-//            Team team = teams.get(i);
-//            System.out.printf("%d. %s | %d | %d | %d | %d \n", i + 1, team.teamName, team.lose, team.win, team.draw, team.points);
-//        }
-//    }
-
     public void displayTable() {
         sortTeams();
 
         // Print header with proper spacing
-        System.out.printf("%-10s %-20s %-10s %-10s %-10s %-10s%n", "Position", "Team", "Points", "Win", "Draw", "Loss");
+        System.out.printf("%-10s %-20s %-10s %-10s %-10s %-10s %-10s %-10s%n", "Position", "Team", "Points", "Win", "Draw", "Loss", "Goals For", "Goals Against");
 
         // Print each team's data with proper formatting
         for (int i = 0; i < teams.size(); i++) {
             Team team = teams.get(i);
-            System.out.printf("%-10d %-20s %-10d %-10d %-10d %-10d%n", i + 1, team.teamName, team.points, team.win, team.draw, team.lose);
+            System.out.printf("%-10d %-20s %-10d %-10d %-10d %-10d %-10d %-10d %n", i + 1, team.teamName, team.points, team.win, team.draw, team.lose, team.goalsScored, team.goalsConceded);
         }
     }
 }
