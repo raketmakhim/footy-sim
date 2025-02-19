@@ -1,140 +1,68 @@
 package engine;
 
-import constants.MatchConstants;
 import enums.MatchOutcomes;
 import objects.Team;
 
-import static constants.MatchConstants.getAbsolutePower;
+import static service.GoalsCalculator.calculateGoalScored;
 
 public class Match {
-    public Team homeTeam;
-    public Team awayTeam;
-    public byte homeTeamGoals;
-    public byte awayTeamGoals;
+    private Team homeTeam;
+    private Team awayTeam;
+    private byte homeTeamGoals;
+    private byte awayTeamGoals;
+    private MatchOutcomesGenerator matchOutcomesGenerator;
 
-    public Match(Team homeTeam, Team awayTeam){
+    public Match(Team homeTeam, Team awayTeam, MatchOutcomesGenerator matchOutcomesGenerator){
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;
+        this.matchOutcomesGenerator = matchOutcomesGenerator;
     }
 
     public Match(){
     }
 
-    public byte getDrawThreshold(){
-        return MatchConstants.calculateDrawThreshold(homeTeam.power, awayTeam.power);
-    }
-
-    public byte getWinOrLoseThreshold(){
-
-        System.out.println("Home Team: " + homeTeam.teamName + ", Power: " + homeTeam.power);
-        System.out.println("Away Team: " + awayTeam.teamName + ", Power: " + awayTeam.power);
-
-        return MatchConstants.calculateWinOrLoseThreshold(homeTeam.power, awayTeam.power);
-    }
-
     public MatchOutcomes getMatchOutcome() {
-        homeTeamGoals = 0; awayTeamGoals = 0;
-
-        byte randomNumber = (byte) (Math.random()*100);
-        System.out.println("Random Number: " + randomNumber);
-
-        int highPowerThreshold = MatchConstants.calculateWinThreshold(getDrawThreshold(), getWinOrLoseThreshold());
-
-        if (randomNumber < getDrawThreshold()) {
-            calculateGoalScored(MatchOutcomes.DRAW);
-            return MatchOutcomes.DRAW;
-        }
-
-        boolean isHigherPowerWinsAndHomeTeamHasHigherPower = randomNumber < highPowerThreshold && homeTeam.power >= awayTeam.power;
-        boolean isHigherPowerLosesAndHomeTeamHasLowerPower = randomNumber > highPowerThreshold && homeTeam.power < awayTeam.power;
-
-        if (isHigherPowerWinsAndHomeTeamHasHigherPower || isHigherPowerLosesAndHomeTeamHasLowerPower) {
-            calculateGoalScored(MatchOutcomes.HOME_WIN);
-            return MatchOutcomes.HOME_WIN;
-        }
-
-        calculateGoalScored(MatchOutcomes.AWAY_WIN);
-
+        MatchOutcomes outcome = matchOutcomesGenerator.determineOutcome(this.homeTeam, this.awayTeam);
+        calculateGoalScored(this, outcome);
         addGoalsToTeams(homeTeam, homeTeamGoals, awayTeamGoals);
         addGoalsToTeams(awayTeam, awayTeamGoals, homeTeamGoals);
-
-        return MatchOutcomes.AWAY_WIN;
+        return outcome;
     }
 
     private void addGoalsToTeams(Team team, byte goalsScored, byte goalsConceded){
-        team.goalsScored += goalsScored;
-        team.goalsConceded += goalsConceded;
+        team.addGoalsScored(goalsScored);
+        team.addGoalsConceded(goalsConceded);
     }
 
-    public void calculateGoalScored(MatchOutcomes outcome){
-        switch (outcome) {
-            case HOME_WIN -> {
-                calculateGoalsScored(this.homeTeam, this.awayTeam, outcome);
-            }
-            case AWAY_WIN -> {
-                calculateGoalsScored(this.awayTeam, this.homeTeam, outcome);
-            }
-            default -> {
-                calculateDrawGoals();
-            }
-        }
-        System.out.println(
-                homeTeam.teamName + ": " + homeTeamGoals + awayTeam.teamName + ": " + awayTeamGoals
-        );
+    public Team getHomeTeam() {
+        return homeTeam;
     }
 
-    private void calculateDrawGoals(){
-        byte randomNumber = (byte) (Math.random()*100);
-        if (randomNumber < 30) {
-            homeTeamGoals = 0;
-            awayTeamGoals = 0;
-        } else if (randomNumber < 50){
-            homeTeamGoals= 1;
-            awayTeamGoals= 1;
-        } else if (randomNumber < 70){
-            homeTeamGoals = 2;
-            awayTeamGoals = 2;
-        } else if (randomNumber < 80){
-            homeTeamGoals = 3;
-            awayTeamGoals = 3;
-        } else if (randomNumber < 90){
-            homeTeamGoals = 4;
-            awayTeamGoals = 4;
-        } else {
-            homeTeamGoals = 5;
-            awayTeamGoals = 5;
-        }
+    public void setHomeTeam(Team homeTeam) {
+        this.homeTeam = homeTeam;
     }
 
-    private void calculateGoalsScored(Team winningTeam, Team losingTeam, MatchOutcomes outcome){
-        byte randomNumber = (byte) (Math.random()*100);
-        byte powerDifference = (byte) Math.abs(winningTeam.offensivePower - losingTeam.defensivePower);
-        int goalCriteria = (randomNumber * powerDifference);
-
-        byte winningTeamGoal = 0;
-        byte losingTeamGoal = 0;
-
-        if (goalCriteria < 3000){
-            winningTeamGoal = (byte) (1 + Math.round(goalCriteria/120));
-        } else if (goalCriteria > 3000){
-            winningTeamGoal = (byte) (5 + Math.random()*6);
-        }
-
-        if (winningTeamGoal > 1){
-            losingTeamGoal = (byte) ((winningTeamGoal - 1) * Math.random());
-        }
-
-        if (outcome == MatchOutcomes.HOME_WIN){
-            homeTeamGoals = winningTeamGoal;
-            awayTeamGoals = losingTeamGoal;
-        } else {
-            awayTeamGoals = winningTeamGoal;
-            homeTeamGoals = losingTeamGoal;
-        }
-
+    public Team getAwayTeam() {
+        return awayTeam;
     }
 
+    public void setAwayTeam(Team awayTeam) {
+        this.awayTeam = awayTeam;
+    }
 
+    public byte getHomeTeamGoals() {
+        return homeTeamGoals;
+    }
 
+    public void setHomeTeamGoals(byte homeTeamGoals) {
+        this.homeTeamGoals = homeTeamGoals;
+    }
 
+    public byte getAwayTeamGoals() {
+        return awayTeamGoals;
+    }
+
+    public void setAwayTeamGoals(byte awayTeamGoals) {
+        this.awayTeamGoals = awayTeamGoals;
+    }
 }
