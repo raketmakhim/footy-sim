@@ -1,14 +1,12 @@
 package constants;
 
-import engine.Match;
-import enums.MatchOutcomes;
+import utils.PowerUtils;
 
 public class MatchConstants {
 
-
     public static byte calculateDrawThreshold(byte power1, byte power2){
 
-        byte absPower = getAbsolutePower(power1, power2);
+        byte absPower = PowerUtils.getAbsolutePower(power1, power2);
 
         if (absPower < 42) {
             return (byte) (25-0.5*absPower);
@@ -20,7 +18,7 @@ public class MatchConstants {
     public static byte calculateWinOrLoseThreshold(byte power1, byte power2){
 
         //Power difference of the two teams (only want positive value)
-        byte absPower = (byte) getAbsolutePower(power1, power2);
+        byte absPower = (byte) PowerUtils.getAbsolutePower(power1, power2);
 
         if (absPower <= 5){
             //if difference is <= 5: P(Win) = 2*P+50
@@ -36,9 +34,5 @@ public class MatchConstants {
 
     public static int calculateWinThreshold(byte drawThreshold, byte winOrLoseThreshold){
         return drawThreshold + (100-drawThreshold)*winOrLoseThreshold/100;
-    }
-
-    public static byte getAbsolutePower(byte power1, byte power2){
-        return (byte) Math.abs(power1 - power2);
     }
 }

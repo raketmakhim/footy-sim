@@ -1,31 +1,29 @@
 package objects;
 
 import engine.Match;
+import engine.MatchOutcomesGenerator;
 import enums.MatchOutcomes;
+import probability.LeagueMatchProbabilityCalculator;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class League {
     private final List<Team> teams;
 
     private Match leagueMatch;
+    private MatchOutcomesGenerator leagueMatchOutcomeGenerator;
 
     public League() {
-        teams = new ArrayList<>();
+        this.leagueMatchOutcomeGenerator = new MatchOutcomesGenerator(new LeagueMatchProbabilityCalculator());
+        this.teams = new ArrayList<>();
     }
 
-    public void addTeam(Team team, String name, byte power, byte offensivePower, byte defensivePower) {
-        team.teamName = name;
-        team.power = power;
-        team.offensivePower = offensivePower;
-        team.defensivePower = defensivePower;
+    public void addTeam(Team team) {
         teams.add(team);
     }
 
     public void playLeague(){
-        leagueMatch = new Match();
         for (int i = 0; i < teams.size()-1; i++){
             for (int j = i+1; j < teams.size(); j++){
                 playLeagueMatch(teams.get(i), teams.get(j));
@@ -35,42 +33,28 @@ public class League {
     }
 
     public void playLeagueMatch(Team homeTeam, Team awayTeam){
-        leagueMatch.homeTeam = homeTeam;
-        leagueMatch.awayTeam = awayTeam;
+        leagueMatch = new Match(homeTeam,awayTeam, leagueMatchOutcomeGenerator);
+        leagueMatch.setHomeTeam(homeTeam);
+        leagueMatch.setAwayTeam(awayTeam);
         MatchOutcomes result = leagueMatch.getMatchOutcome();
 
         switch (result) {
             case DRAW -> {
-                homeTeam.draw();
-                awayTeam.draw();
+                homeTeam.recordDraw();
+                awayTeam.recordDraw();
             }
             case HOME_WIN -> {
-                homeTeam.win();
-                awayTeam.loss();
+                homeTeam.recordWin();
+                awayTeam.recordLoss();
             }
             case AWAY_WIN -> {
-                homeTeam.loss();
-                awayTeam.win();
+                homeTeam.recordLoss();
+                awayTeam.recordWin();
             }
         }
     }
 
-    public void sortTeams() {
-        teams.sort(Comparator
-                .comparingInt(Team::getPoints).reversed()
-        );
-    }
-
-    public void displayTable() {
-        sortTeams();
-
-        // Print header with proper spacing
-        System.out.printf("%-10s %-20s %-10s %-10s %-10s %-10s %-10s %-10s%n", "Position", "Team", "Points", "Win", "Draw", "Loss", "Goals For", "Goals Against");
-
-        // Print each team's data with proper formatting
-        for (int i = 0; i < teams.size(); i++) {
-            Team team = teams.get(i);
-            System.out.printf("%-10d %-20s %-10d %-10d %-10d %-10d %-10d %-10d %n", i + 1, team.teamName, team.points, team.win, team.draw, team.lose, team.goalsScored, team.goalsConceded);
-        }
+    public List<Team> getTeams() {
+        return teams;
     }
 }
