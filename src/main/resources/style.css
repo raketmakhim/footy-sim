@@ -1,0 +1,213 @@
+/* ===== Root / Window ===== */
+.root {
+    -fx-background-color: #1a1a2e;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 13px;
+}
+
+/* ===== Tab Pane ===== */
+.tab-pane {
+    -fx-background-color: #1a1a2e;
+    -fx-tab-min-width: 140px;
+}
+
+.tab-pane .tab-header-area {
+    -fx-background-color: #0f0f1a;
+    -fx-padding: 4 0 0 0;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #0f0f1a;
+}
+
+.tab-pane .tab {
+    -fx-background-color: #16213e;
+    -fx-background-radius: 6 6 0 0;
+    -fx-padding: 8 20 8 20;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #0f3460;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #4ade80;
+}
+
+.tab-pane .tab:hover .tab-label {
+    -fx-text-fill: #e2e8f0;
+}
+
+.tab-pane .tab-content-area {
+    -fx-background-color: #1a1a2e;
+    -fx-padding: 0;
+}
+
+/* ===== Labels ===== */
+.label {
+    -fx-text-fill: #e2e8f0;
+}
+
+.label-header {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4ade80;
+    -fx-padding: 10 0 4 0;
+}
+
+.label-sub {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+}
+
+.result-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f8fafc;
+    -fx-background-color: #16213e;
+    -fx-background-radius: 8;
+    -fx-padding: 24 20 24 20;
+    -fx-alignment: center;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+/* ===== Buttons ===== */
+.button {
+    -fx-background-color: #4ade80;
+    -fx-text-fill: #0f1a0f;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 10 30 10 30;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.button:hover {
+    -fx-background-color: #22c55e;
+}
+
+.button:pressed {
+    -fx-background-color: #16a34a;
+}
+
+.button:disabled {
+    -fx-background-color: #374151;
+    -fx-text-fill: #6b7280;
+}
+
+/* ===== ComboBox ===== */
+.combo-box {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-min-width: 200px;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #16213e;
+    -fx-text-fill: #e2e8f0;
+    -fx-padding: 4 8 4 8;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: #16213e;
+    -fx-text-fill: #e2e8f0;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #0f3460;
+}
+
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: #0f3460;
+    -fx-text-fill: #4ade80;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .arrow-button .arrow {
+    -fx-background-color: #4ade80;
+}
+
+/* ===== TextArea ===== */
+.text-area {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-border-width: 1;
+}
+
+.text-area .content {
+    -fx-background-color: #16213e;
+}
+
+.text-area .text {
+    -fx-fill: #e2e8f0;
+    -fx-font-family: "Courier New", "Consolas", monospace;
+    -fx-font-size: 12px;
+}
+
+.text-area:focused {
+    -fx-border-color: #4ade80;
+}
+
+/* ===== ScrollBar ===== */
+.scroll-bar {
+    -fx-background-color: #1a1a2e;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #0f3460;
+    -fx-background-radius: 4;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #4ade80;
+}
+
+.scroll-bar .track {
+    -fx-background-color: #1a1a2e;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+
+/* ===== SplitPane ===== */
+.split-pane {
+    -fx-background-color: #1a1a2e;
+    -fx-padding: 0;
+}
+
+.split-pane-divider {
+    -fx-background-color: #0f3460;
+    -fx-padding: 2 0 2 0;
+}
+
+/* ===== Section titles ===== */
+.section-title {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748b;
+    -fx-padding: 0 0 4 2;
+}

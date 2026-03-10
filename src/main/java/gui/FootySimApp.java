@@ -3,6 +3,17 @@ package gui;
 import engine.Match;
 import engine.MatchOutcomesGenerator;
 import enums.MatchOutcomes;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import objects.League;
 import objects.Team;
 import probability.LeagueMatchProbabilityCalculator;
@@ -10,93 +21,92 @@ import repository.TeamRepository;
 import service.GoalsCalculator;
 import utils.RandomNumberGenerator;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FootySimApp extends JFrame {
+public class FootySimApp extends Application {
 
-    private final List<Team> allTeams;
+    private final List<Team> allTeams = new TeamRepository().loadTeams();
 
     // Match tab
-    private JComboBox<String> homeTeamCombo;
-    private JComboBox<String> awayTeamCombo;
-    private JLabel matchResultLabel;
+    private ComboBox<String> homeTeamCombo;
+    private ComboBox<String> awayTeamCombo;
+    private Label matchResultLabel;
 
     // League tab
-    private JTextArea leagueResultsArea;
-    private JTextArea leagueTableArea;
-    private JButton simulateButton;
+    private TextArea leagueResultsArea;
+    private TextArea leagueTableArea;
+    private Button simulateButton;
 
-    public FootySimApp() {
-        super("FootySim");
-        allTeams = new TeamRepository().loadTeams();
+    @Override
+    public void start(Stage stage) {
+        TabPane tabPane = new TabPane();
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 700);
-        setLocationRelativeTo(null);
+        Tab matchTab = new Tab("Single Match", buildMatchTab());
+        Tab leagueTab = new Tab("League Simulation", buildLeagueTab());
+        tabPane.getTabs().addAll(matchTab, leagueTab);
 
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Single Match", buildMatchTab());
-        tabs.addTab("League Simulation", buildLeagueTab());
+        Scene scene = new Scene(tabPane, 960, 720);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
 
-        add(tabs);
-        setVisible(true);
+        stage.setTitle("FootySim");
+        stage.setScene(scene);
+        stage.show();
     }
 
     // -------------------------------------------------------------------------
     // Match Tab
     // -------------------------------------------------------------------------
 
-    private JPanel buildMatchTab() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    private VBox buildMatchTab() {
+        VBox root = new VBox(20);
+        root.setPadding(new Insets(30));
+        root.setAlignment(Pos.TOP_CENTER);
 
-        String[] teamNames = allTeams.stream()
+        Label header = new Label("Play a Match");
+        header.getStyleClass().add("label-header");
+
+        List<String> teamNames = allTeams.stream()
                 .map(Team::getTeamName)
-                .toArray(String[]::new);
+                .collect(Collectors.toList());
 
-        homeTeamCombo = new JComboBox<>(teamNames);
-        awayTeamCombo = new JComboBox<>(teamNames);
-        if (teamNames.length > 1) awayTeamCombo.setSelectedIndex(1);
+        homeTeamCombo = new ComboBox<>(FXCollections.observableArrayList(teamNames));
+        awayTeamCombo = new ComboBox<>(FXCollections.observableArrayList(teamNames));
+        homeTeamCombo.getSelectionModel().selectFirst();
+        if (teamNames.size() > 1) awayTeamCombo.getSelectionModel().select(1);
 
-        JPanel selectionRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 5));
-        selectionRow.add(new JLabel("Home:"));
-        selectionRow.add(homeTeamCombo);
-        selectionRow.add(new JLabel("  vs  "));
-        selectionRow.add(new JLabel("Away:"));
-        selectionRow.add(awayTeamCombo);
+        Label vsLabel = new Label("vs");
+        vsLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #64748b;");
 
-        matchResultLabel = new JLabel("Select teams and click Play", SwingConstants.CENTER);
-        matchResultLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
-        matchResultLabel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEtchedBorder(),
-                BorderFactory.createEmptyBorder(20, 10, 20, 10)
-        ));
+        HBox selectionRow = new HBox(16,
+                new Label("Home:"), homeTeamCombo,
+                vsLabel,
+                new Label("Away:"), awayTeamCombo);
+        selectionRow.setAlignment(Pos.CENTER);
 
-        JButton playButton = new JButton("Play Match");
-        playButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        playButton.addActionListener(e -> playMatch());
+        matchResultLabel = new Label("Select teams and click Play");
+        matchResultLabel.getStyleClass().add("result-label");
+        matchResultLabel.setMaxWidth(Double.MAX_VALUE);
+        matchResultLabel.setAlignment(Pos.CENTER);
+        VBox.setVgrow(matchResultLabel, Priority.ALWAYS);
 
-        JPanel southPanel = new JPanel(new FlowLayout());
-        southPanel.add(playButton);
+        Button playButton = new Button("Play Match");
+        playButton.setOnAction(e -> playMatch());
 
-        panel.add(selectionRow, BorderLayout.NORTH);
-        panel.add(matchResultLabel, BorderLayout.CENTER);
-        panel.add(southPanel, BorderLayout.SOUTH);
-
-        return panel;
+        root.getChildren().addAll(header, selectionRow, matchResultLabel, playButton);
+        return root;
     }
 
     private void playMatch() {
-        int homeIdx = homeTeamCombo.getSelectedIndex();
-        int awayIdx = awayTeamCombo.getSelectedIndex();
+        int homeIdx = homeTeamCombo.getSelectionModel().getSelectedIndex();
+        int awayIdx = awayTeamCombo.getSelectionModel().getSelectedIndex();
 
         if (homeIdx == awayIdx) {
-            JOptionPane.showMessageDialog(this, "Please select two different teams.",
-                    "Invalid Selection", JOptionPane.WARNING_MESSAGE);
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Please select two different teams.", ButtonType.OK);
+            alert.setHeaderText("Invalid Selection");
+            alert.showAndWait();
             return;
         }
 
@@ -128,46 +138,56 @@ public class FootySimApp extends JFrame {
     // League Tab
     // -------------------------------------------------------------------------
 
-    private JPanel buildLeagueTab() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+    private VBox buildLeagueTab() {
+        VBox root = new VBox(12);
+        root.setPadding(new Insets(20));
 
-        leagueResultsArea = new JTextArea();
+        Label header = new Label("League Simulation");
+        header.getStyleClass().add("label-header");
+
+        leagueResultsArea = new TextArea();
         leagueResultsArea.setEditable(false);
-        leagueResultsArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        JScrollPane resultsScroll = new JScrollPane(leagueResultsArea);
-        resultsScroll.setBorder(BorderFactory.createTitledBorder("Match Results"));
+        leagueResultsArea.setWrapText(false);
+        leagueResultsArea.setPromptText("Match results will appear here...");
 
-        leagueTableArea = new JTextArea();
+        leagueTableArea = new TextArea();
         leagueTableArea.setEditable(false);
-        leagueTableArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        JScrollPane tableScroll = new JScrollPane(leagueTableArea);
-        tableScroll.setBorder(BorderFactory.createTitledBorder("Final Table"));
+        leagueTableArea.setWrapText(false);
+        leagueTableArea.setPromptText("Final table will appear here...");
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, resultsScroll, tableScroll);
-        splitPane.setResizeWeight(0.65);
+        Label resultsTitle = new Label("MATCH RESULTS");
+        resultsTitle.getStyleClass().add("section-title");
+        Label tableTitle = new Label("FINAL TABLE");
+        tableTitle.getStyleClass().add("section-title");
 
-        simulateButton = new JButton("Simulate League");
-        simulateButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        simulateButton.addActionListener(e -> startLeagueSimulation());
+        VBox resultsBox = new VBox(4, resultsTitle, leagueResultsArea);
+        VBox tableBox = new VBox(4, tableTitle, leagueTableArea);
+        VBox.setVgrow(leagueResultsArea, Priority.ALWAYS);
+        VBox.setVgrow(leagueTableArea, Priority.ALWAYS);
 
-        JPanel southPanel = new JPanel(new FlowLayout());
-        southPanel.add(simulateButton);
+        SplitPane splitPane = new SplitPane(resultsBox, tableBox);
+        splitPane.setOrientation(Orientation.VERTICAL);
+        splitPane.setDividerPositions(0.6);
+        VBox.setVgrow(splitPane, Priority.ALWAYS);
 
-        panel.add(splitPane, BorderLayout.CENTER);
-        panel.add(southPanel, BorderLayout.SOUTH);
+        simulateButton = new Button("Simulate League");
+        simulateButton.setOnAction(e -> startLeagueSimulation());
 
-        return panel;
+        HBox buttonRow = new HBox(simulateButton);
+        buttonRow.setAlignment(Pos.CENTER);
+
+        root.getChildren().addAll(header, splitPane, buttonRow);
+        return root;
     }
 
     private void startLeagueSimulation() {
-        leagueResultsArea.setText("");
-        leagueTableArea.setText("");
-        simulateButton.setEnabled(false);
+        leagueResultsArea.clear();
+        leagueTableArea.clear();
+        simulateButton.setDisable(true);
 
-        SwingWorker<League, String> worker = new SwingWorker<League, String>() {
+        Task<League> task = new Task<League>() {
             @Override
-            protected League doInBackground() {
+            protected League call() {
                 List<Team> freshTeams = allTeams.stream()
                         .map(FootySimApp.this::freshCopy)
                         .collect(Collectors.toList());
@@ -175,35 +195,28 @@ public class FootySimApp extends JFrame {
                 League league = new League();
                 freshTeams.forEach(league::addTeam);
 
-                league.setMatchResultListener(result -> publish(result.toDisplayString()));
+                league.setMatchResultListener(result ->
+                        Platform.runLater(() ->
+                                leagueResultsArea.appendText(result.toDisplayString() + "\n")
+                        )
+                );
 
                 league.playLeague();
                 return league;
             }
-
-            @Override
-            protected void process(List<String> chunks) {
-                for (String line : chunks) {
-                    leagueResultsArea.append(line + "\n");
-                }
-                leagueResultsArea.setCaretPosition(leagueResultsArea.getDocument().getLength());
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    renderFinalTable(get());
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(FootySimApp.this,
-                            "Simulation failed: " + ex.getMessage(),
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                } finally {
-                    simulateButton.setEnabled(true);
-                }
-            }
         };
 
-        worker.execute();
+        task.setOnSucceeded(e -> {
+            renderFinalTable(task.getValue());
+            simulateButton.setDisable(false);
+        });
+
+        task.setOnFailed(e -> {
+            new Alert(Alert.AlertType.ERROR, "Simulation failed: " + task.getException().getMessage()).show();
+            simulateButton.setDisable(false);
+        });
+
+        new Thread(task).start();
     }
 
     private void renderFinalTable(League league) {
@@ -238,13 +251,5 @@ public class FootySimApp extends JFrame {
                 (byte) source.getOffensivePower(),
                 (byte) source.getDefensivePower()
         );
-    }
-
-    // -------------------------------------------------------------------------
-    // Entry Point
-    // -------------------------------------------------------------------------
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(FootySimApp::new);
     }
 }
