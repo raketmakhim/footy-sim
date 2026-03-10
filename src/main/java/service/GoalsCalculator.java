@@ -25,9 +25,7 @@ public class GoalsCalculator {
                 calculateDrawGoals(match);
             }
         }
-        System.out.println(
-                match.getHomeTeam().getTeamName() + ": " + match.getHomeTeamGoals() + match.getAwayTeam().getTeamName() + ": " + match.getAwayTeamGoals()
-        );
+
     }
 
     private void calculateDrawGoals(Match match){
@@ -56,8 +54,8 @@ public class GoalsCalculator {
         byte losingTeamGoal = 0;
 
         if (goalCriteria < 4000){
-            winningTeamGoal = (byte) (1 + Math.round(goalCriteria/300));
-        } else if (goalCriteria > 4000){
+            winningTeamGoal = (byte) (1 + Math.round(goalCriteria / 300.0));
+        } else {
             winningTeamGoal = (byte) (3 + rng.generate() * 6 / 100);
         }
 
