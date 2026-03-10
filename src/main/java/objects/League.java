@@ -4,6 +4,8 @@ import engine.Match;
 import engine.MatchOutcomesGenerator;
 import enums.MatchOutcomes;
 import probability.LeagueMatchProbabilityCalculator;
+import service.GoalsCalculator;
+import utils.RandomNumberGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +14,13 @@ public class League {
     private final List<Team> teams;
 
     private Match leagueMatch;
-    private MatchOutcomesGenerator leagueMatchOutcomeGenerator;
+    private final MatchOutcomesGenerator leagueMatchOutcomeGenerator;
+    private final GoalsCalculator goalsCalculator;
 
     public League() {
-        this.leagueMatchOutcomeGenerator = new MatchOutcomesGenerator(new LeagueMatchProbabilityCalculator());
+        RandomNumberGenerator rng = new RandomNumberGenerator();
+        this.leagueMatchOutcomeGenerator = new MatchOutcomesGenerator(new LeagueMatchProbabilityCalculator(), rng);
+        this.goalsCalculator = new GoalsCalculator(rng);
         this.teams = new ArrayList<>();
     }
 
@@ -33,7 +38,7 @@ public class League {
     }
 
     public void playLeagueMatch(Team homeTeam, Team awayTeam){
-        leagueMatch = new Match(homeTeam,awayTeam, leagueMatchOutcomeGenerator);
+        leagueMatch = new Match(homeTeam, awayTeam, leagueMatchOutcomeGenerator, goalsCalculator);
         leagueMatch.setHomeTeam(homeTeam);
         leagueMatch.setAwayTeam(awayTeam);
         MatchOutcomes result = leagueMatch.getMatchOutcome();

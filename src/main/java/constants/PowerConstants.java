@@ -46,7 +46,7 @@ public class PowerConstants {
 
     public static int calculateMidfieldPower(List<Player> startingEleven){
         return (int) startingEleven.stream()
-                .filter(players -> players.position.isOffensive())
+                .filter(players -> players.position.isMidfield())
                 .mapToInt(Player::getPower)
                 .average()
                 .orElse(0);

@@ -1,7 +1,7 @@
 package utils;
 
 public class RandomNumberGenerator {
-    public static byte generateRandomNumber() {
-        return (byte) (Math.random() * 100);
+    public int generate() {
+        return (int) (Math.random() * 100);
     }
 }

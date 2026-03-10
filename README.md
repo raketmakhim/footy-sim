@@ -77,3 +77,16 @@ Match outcomes are determined based on team power ratings using probability calc
 
 The higher a team's power compared to their opponent, the higher their chances of winning.
 
+## ⚠️ **Potential Issues**
+
+- **Players not fully integrated** - `Player` entities exist but match simulation only uses team-level power ratings, not individual player stats.
+- **Simplified probability model** - Linear thresholds for match outcomes are a simplification; real football has more variance.
+
+## 💡 **Ideas for Extension**
+
+- Wire `Player` stats into match simulation (injuries, form, fatigue, etc.)
+- Add cup tournament mode alongside the league.
+- Persist results to a database or file for season history.
+- Build a GUI or web frontend to visualize standings and results.
+- Add season-over-season progression with player development.
+

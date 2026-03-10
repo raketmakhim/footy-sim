@@ -3,9 +3,17 @@ package service;
 import engine.Match;
 import enums.MatchOutcomes;
 import objects.Team;
+import utils.RandomNumberGenerator;
 
 public class GoalsCalculator {
-    public static void calculateGoalScored(Match match, MatchOutcomes outcome){
+
+    private final RandomNumberGenerator rng;
+
+    public GoalsCalculator(RandomNumberGenerator rng) {
+        this.rng = rng;
+    }
+
+    public void calculateGoalScored(Match match, MatchOutcomes outcome){
         switch (outcome) {
             case HOME_WIN -> {
                 calculateGoalsScored(match, match.getHomeTeam(), match.getAwayTeam(), outcome);
@@ -22,8 +30,8 @@ public class GoalsCalculator {
         );
     }
 
-    private static void calculateDrawGoals(Match match){
-        byte randomNumber = (byte) (Math.random()*100);
+    private void calculateDrawGoals(Match match){
+        int randomNumber = rng.generate();
         if (randomNumber < 30) {
             setTeamGoals(match, (byte) 0, (byte) 0);
         } else if (randomNumber < 50){
@@ -39,8 +47,8 @@ public class GoalsCalculator {
         }
     }
 
-    private static void calculateGoalsScored(Match match, Team winningTeam, Team losingTeam, MatchOutcomes outcome){
-        byte randomNumber = (byte) (Math.random()*100);
+    private void calculateGoalsScored(Match match, Team winningTeam, Team losingTeam, MatchOutcomes outcome){
+        int randomNumber = rng.generate();
         byte powerDifference = (byte) Math.abs(winningTeam.getOffensivePower() - losingTeam.getDefensivePower());
         int goalCriteria = (randomNumber * powerDifference);
 
@@ -50,11 +58,11 @@ public class GoalsCalculator {
         if (goalCriteria < 4000){
             winningTeamGoal = (byte) (1 + Math.round(goalCriteria/300));
         } else if (goalCriteria > 4000){
-            winningTeamGoal = (byte) (3 + Math.random()*6);
+            winningTeamGoal = (byte) (3 + rng.generate() * 6 / 100);
         }
 
         if (winningTeamGoal > 1){
-            losingTeamGoal = (byte) ((winningTeamGoal - 1) * Math.random());
+            losingTeamGoal = (byte) ((winningTeamGoal - 1) * rng.generate() / 100.0);
         }
 
         if (outcome == MatchOutcomes.HOME_WIN){
@@ -62,10 +70,9 @@ public class GoalsCalculator {
         } else {
             setTeamGoals(match, losingTeamGoal, winningTeamGoal);
         }
-
     }
 
-    private static void setTeamGoals(Match match, byte homeGoals, byte awayGoals){
+    private void setTeamGoals(Match match, byte homeGoals, byte awayGoals){
         match.setHomeTeamGoals(homeGoals);
         match.setAwayTeamGoals(awayGoals);
     }

@@ -5,6 +5,8 @@ import objects.League;
 import objects.Table;
 import objects.Team;
 import probability.LeagueMatchProbabilityCalculator;
+import service.GoalsCalculator;
+import utils.RandomNumberGenerator;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
@@ -23,9 +25,12 @@ public class Main {
 
         homeTeam.setPower((byte) 90);
         awayTeam.setPower((byte) 90);
+
+        RandomNumberGenerator rng = new RandomNumberGenerator();
         LeagueMatchProbabilityCalculator probabilityCalculator = new LeagueMatchProbabilityCalculator();
-        MatchOutcomesGenerator outcomesGenerator = new MatchOutcomesGenerator(probabilityCalculator);
-        Match derbyDay = new Match(homeTeam, awayTeam, outcomesGenerator);
+        MatchOutcomesGenerator outcomesGenerator = new MatchOutcomesGenerator(probabilityCalculator, rng);
+        GoalsCalculator goalsCalculator = new GoalsCalculator(rng);
+        Match derbyDay = new Match(homeTeam, awayTeam, outcomesGenerator, goalsCalculator);
 
         int homeWin = 0, awayWin = 0, draw = 0;
 
