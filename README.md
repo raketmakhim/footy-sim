@@ -13,16 +13,35 @@ Footy-Sim is a Java application that simulates football matches and leagues usin
 - Full league simulation with double round-robin fixtures
 - League table sorting by points, goal difference, and goals scored
 - Probability-based match outcome determination
-- Swing GUI with single match and league simulation modes
+- JavaFX GUI with single match and league simulation modes
 - Live match results streamed during league simulation
 - Team data loaded from `teams.json` — no hardcoded teams
 
 ## Running the App
 
 ```bash
+mvn javafx:run
+```
+
+Or build and run the JAR directly:
+
+```bash
 mvn package
+mvn dependency:copy-dependencies -DoutputDirectory=target
 java -jar target/footy-sim-1.0.0.jar
 ```
+
+## Create an executable
+
+Build the JAR, copy JavaFX dependencies into `target/`, then run jpackage:
+
+```powershell
+mvn package -q
+mvn dependency:copy-dependencies -DoutputDirectory=target -q
+& "a:/Java/jdk-21/bin/jpackage" --input target --main-jar footy-sim-1.0.0.jar --name FootySim --type app-image --dest dist
+```
+
+The `dependency:copy-dependencies` step is required so jpackage can bundle the JavaFX JARs alongside the application. The output is placed in `dist/FootySim/`.
 
 The GUI launches with two tabs:
 - **Single Match** — pick any two teams and play a one-off game
@@ -32,7 +51,7 @@ The GUI launches with two tabs:
 
 ```
 src/main/java/
-├── gui/            # Swing GUI (FootySimApp)
+├── gui/            # JavaFX GUI (FootySimApp, AppLauncher)
 ├── engine/         # Match simulation (Match, MatchOutcomesGenerator)
 ├── objects/        # Domain models (Team, Player, League, Table)
 ├── model/          # Data carriers (MatchResult)
