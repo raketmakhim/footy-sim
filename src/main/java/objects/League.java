@@ -3,20 +3,32 @@ package objects;
 import engine.Match;
 import engine.MatchOutcomesGenerator;
 import enums.MatchOutcomes;
+import model.MatchResult;
 import probability.LeagueMatchProbabilityCalculator;
+import service.GoalsCalculator;
+import utils.RandomNumberGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class League {
     private final List<Team> teams;
 
     private Match leagueMatch;
-    private MatchOutcomesGenerator leagueMatchOutcomeGenerator;
+    private final MatchOutcomesGenerator leagueMatchOutcomeGenerator;
+    private final GoalsCalculator goalsCalculator;
+    private Consumer<MatchResult> matchResultListener;
 
     public League() {
-        this.leagueMatchOutcomeGenerator = new MatchOutcomesGenerator(new LeagueMatchProbabilityCalculator());
+        RandomNumberGenerator rng = new RandomNumberGenerator();
+        this.leagueMatchOutcomeGenerator = new MatchOutcomesGenerator(new LeagueMatchProbabilityCalculator(), rng);
+        this.goalsCalculator = new GoalsCalculator(rng);
         this.teams = new ArrayList<>();
+    }
+
+    public void setMatchResultListener(Consumer<MatchResult> listener) {
+        this.matchResultListener = listener;
     }
 
     public void addTeam(Team team) {
@@ -33,7 +45,7 @@ public class League {
     }
 
     public void playLeagueMatch(Team homeTeam, Team awayTeam){
-        leagueMatch = new Match(homeTeam,awayTeam, leagueMatchOutcomeGenerator);
+        leagueMatch = new Match(homeTeam, awayTeam, leagueMatchOutcomeGenerator, goalsCalculator);
         leagueMatch.setHomeTeam(homeTeam);
         leagueMatch.setAwayTeam(awayTeam);
         MatchOutcomes result = leagueMatch.getMatchOutcome();
@@ -51,6 +63,16 @@ public class League {
                 homeTeam.recordLoss();
                 awayTeam.recordWin();
             }
+        }
+
+        if (matchResultListener != null) {
+            matchResultListener.accept(new MatchResult(
+                    homeTeam.getTeamName(),
+                    awayTeam.getTeamName(),
+                    leagueMatch.getHomeTeamGoals(),
+                    leagueMatch.getAwayTeamGoals(),
+                    result
+            ));
         }
     }
 

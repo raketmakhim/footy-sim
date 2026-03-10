@@ -2,8 +2,7 @@ package engine;
 
 import enums.MatchOutcomes;
 import objects.Team;
-
-import static service.GoalsCalculator.calculateGoalScored;
+import service.GoalsCalculator;
 
 public class Match {
     private Team homeTeam;
@@ -11,11 +10,13 @@ public class Match {
     private byte homeTeamGoals;
     private byte awayTeamGoals;
     private MatchOutcomesGenerator matchOutcomesGenerator;
+    private GoalsCalculator goalsCalculator;
 
-    public Match(Team homeTeam, Team awayTeam, MatchOutcomesGenerator matchOutcomesGenerator){
+    public Match(Team homeTeam, Team awayTeam, MatchOutcomesGenerator matchOutcomesGenerator, GoalsCalculator goalsCalculator){
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;
         this.matchOutcomesGenerator = matchOutcomesGenerator;
+        this.goalsCalculator = goalsCalculator;
     }
 
     public Match(){
@@ -23,7 +24,7 @@ public class Match {
 
     public MatchOutcomes getMatchOutcome() {
         MatchOutcomes outcome = matchOutcomesGenerator.determineOutcome(this.homeTeam, this.awayTeam);
-        calculateGoalScored(this, outcome);
+        goalsCalculator.calculateGoalScored(this, outcome);
         addGoalsToTeams(homeTeam, homeTeamGoals, awayTeamGoals);
         addGoalsToTeams(awayTeam, awayTeamGoals, homeTeamGoals);
         return outcome;

@@ -4,76 +4,66 @@ A football (soccer) simulation engine that simulates matches and leagues based o
 
 ## Overview
 
-Footy-Sim is a Java application that simulates football matches and leagues. It uses a power-based system to determine match outcomes where teams with higher power ratings have better chances of winning.
+Footy-Sim is a Java application that simulates football matches and leagues using a top-down approach — match outcomes are determined first based on team power ratings, then goal distributions are calculated accordingly. This ensures more realistic league standings driven by team strength rather than random luck.
 
 ## Features
 
 - Team and player management with power ratings
 - Match simulation based on team power
-- Full league simulation with fixtures generation
+- Full league simulation with double round-robin fixtures
 - League table sorting by points, goal difference, and goals scored
 - Probability-based match outcome determination
+- Swing GUI with single match and league simulation modes
+- Live match results streamed during league simulation
+- Team data loaded from `teams.json` — no hardcoded teams
 
-## Classes
+## Running the App
 
-### Main Classes
+```bash
+mvn package
+java -jar target/footy-sim-1.0.0.jar
+```
 
-- **Game**: Represents a football match between two teams with methods to simulate match results.
-- **Team**: Represents a football team with players, power rating, and match statistics.
-- **Player**: Represents a football player with a name and power rating.
-- **League**: Manages a collection of teams, fixtures, and the simulation of match days.
+The GUI launches with two tabs:
+- **Single Match** — pick any two teams and play a one-off game
+- **League Simulation** — simulate a full Premier League season with live results and a final table
 
-### Utility Classes
+## Project Structure
 
-- **LeagueUtils**: Provides methods for generating fixtures and sorting teams in a league table.
-- **MatchSimulator**: Contains the logic for simulating match results based on team power.
-- **OutcomeCalculator**: Calculates win and draw probabilities based on team power ratings.
-- **PowerUtils**: Utilities for power rating calculations.
+```
+src/main/java/
+├── gui/            # Swing GUI (FootySimApp)
+├── engine/         # Match simulation (Match, MatchOutcomesGenerator)
+├── objects/        # Domain models (Team, Player, League, Table)
+├── model/          # Data carriers (MatchResult)
+├── repository/     # JSON persistence (TeamRepository)
+├── service/        # Business logic (GoalsCalculator, PowerCalculator)
+├── probability/    # Outcome probability calculations
+├── strategy/       # Position-based power calculation strategies
+├── constants/      # Stat weights per position
+├── enums/          # Position, MatchOutcomes
+└── utils/          # RandomNumberGenerator, PowerUtils
 
-## How It Works
-
-1. Teams are created with players, each having a power rating
-2. A league is created with a list of teams
-3. Fixtures are generated for all teams to play each other
-4. Match days are simulated, with each match determined by team power ratings
-5. Results are calculated based on probabilistic outcomes
-6. The league table is updated with points and goals
-
-## Usage
-
-Example usage from the `Main` class:
-
-```java
-// Create players
-Player player1 = new Player("Player 1", (byte) 80);
-Player player2 = new Player("Player 2", (byte) 75);
-// ...
-
-// Create teams
-List<Player> teamAPlayers = Arrays.asList(player1, player2, ...);
-Team teamA = new Team("Team A", teamAPlayers);
-// ...
-
-// Create and simulate league
-List<Team> teams = Arrays.asList(teamA, teamB, ...);
-League league = new League(teams);
-
-// Simulate all match days
-while (league.getCurrentMatchDay() <= league.getTotalMatchDays()) {
-    league.simulateMatchDay();
-}
-
-// Display final league table
-System.out.println(league);
+src/main/resources/
+└── teams.json      # Team data (name, power, offensivePower, defensivePower)
 ```
 
 ## Simulation Logic
 
-Match outcomes are determined based on team power ratings using probability calculations. The system considers:
+Match outcomes are determined based on team power ratings using probability thresholds:
 
-1. Absolute power difference between teams
-2. Home advantage
-3. Random elements to create realistic unpredictability
+1. Power difference between teams influences draw probability
+2. The stronger team has a higher chance of winning
+3. Goals are calculated after the outcome is decided, based on offensive vs defensive power
 
-The higher a team's power compared to their opponent, the higher their chances of winning.
+## ⚠️ Known Limitations
 
+- **Players not fully integrated** — `Player` entities exist but match simulation only uses team-level power ratings, not individual player stats.
+- **Simplified probability model** — Linear thresholds for match outcomes are a simplification; real football has more variance.
+
+## 💡 Ideas for Extension
+
+- Wire `Player` stats into match simulation (injuries, form, fatigue, etc.)
+- Add cup tournament mode alongside the league.
+- Persist results to a database or file for season history.
+- Add season-over-season progression with player development.

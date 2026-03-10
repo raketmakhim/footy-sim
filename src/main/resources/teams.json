@@ -1,0 +1,24 @@
+{
+  "teams": [
+    { "name": "Manchester United",  "power": 80, "offensivePower": 82, "defensivePower": 75 },
+    { "name": "Liverpool",          "power": 90, "offensivePower": 90, "defensivePower": 90 },
+    { "name": "Manchester City",    "power": 91, "offensivePower": 92, "defensivePower": 90 },
+    { "name": "Arsenal",            "power": 87, "offensivePower": 86, "defensivePower": 88 },
+    { "name": "Chelsea",            "power": 86, "offensivePower": 84, "defensivePower": 88 },
+    { "name": "Nottingham Forest",  "power": 82, "offensivePower": 82, "defensivePower": 84 },
+    { "name": "Newcastle",          "power": 84, "offensivePower": 88, "defensivePower": 80 },
+    { "name": "Bournemouth",        "power": 81, "offensivePower": 80, "defensivePower": 82 },
+    { "name": "Fulham",             "power": 80, "offensivePower": 80, "defensivePower": 80 },
+    { "name": "Aston Villa",        "power": 79, "offensivePower": 77, "defensivePower": 78 },
+    { "name": "Brighton",           "power": 80, "offensivePower": 80, "defensivePower": 80 },
+    { "name": "Brentford",          "power": 78, "offensivePower": 77, "defensivePower": 80 },
+    { "name": "Tottenham",          "power": 79, "offensivePower": 79, "defensivePower": 80 },
+    { "name": "West Ham",           "power": 74, "offensivePower": 78, "defensivePower": 70 },
+    { "name": "Everton",            "power": 72, "offensivePower": 70, "defensivePower": 77 },
+    { "name": "Crystal Palace",     "power": 70, "offensivePower": 70, "defensivePower": 70 },
+    { "name": "Wolves",             "power": 72, "offensivePower": 72, "defensivePower": 72 },
+    { "name": "Leicester City",     "power": 73, "offensivePower": 75, "defensivePower": 70 },
+    { "name": "Ipswich Town",       "power": 67, "offensivePower": 70, "defensivePower": 65 },
+    { "name": "Southampton",        "power": 65, "offensivePower": 67, "defensivePower": 60 }
+  ]
+}
